@@ -1,86 +1,109 @@
-Documentation: "App.js"
-Overview:
-This document outlines the structure and functionality of "App.js", a Node.js application file that serves as the main entry point for an API. It is built using the Express.js framework for handling HTTP requests and MongoDB for database operations. The application provides endpoints for managing books and user authentication.
+### API Documentation
 
-Dependencies:
-dotenv: Version 16.4.5
-express: Version 4.19.2
-jsonwebtoken: Version 9.0.2
-mongoose: Version 8.3.4
-nodemon: Version 3.1.0
-Configuration:
-PORT: Default port is set to 3000.
-mongoDb_URL: MongoDB connection URL with credentials.
-Secret: Secret key for JWT token generation.
-Endpoints:
-GET /books
-Description: Retrieves all books from the database.
-Middleware: Authentication required.
-Response: Returns a JSON array of books.
-POST /books
-Description: Adds a new book to the database.
-Middleware: Authentication required.
-Request Body Parameters:
-title: Title of the book.
-Response: Returns a JSON object with a message indicating success or failure and the ID of the added book.
-PUT /books/:id
-Description: Updates an existing book in the database.
-Middleware: Authentication required.
-Path Parameters:
-id: ID of the book to be updated.
-Request Body Parameters: Book details to be updated.
-Response: Returns a JSON object with a message indicating success or failure.
-DELETE /books/:id
-Description: Deletes a book from the database.
-Middleware: Authentication required.
-Path Parameters:
-id: ID of the book to be deleted.
-Response: Returns a JSON object with a message indicating success or failure.
-POST /user/signup
-Description: Registers a new user.
-Request Body Parameters:
-username: Username of the user.
-password: Password of the user.
-Response: Returns a JSON object with a message indicating success or failure and a JWT token for authentication.
-POST /user/login
-Description: Authenticates an existing user.
-Request Body Parameters:
-username: Username of the user.
-password: Password of the user.
-Response: Returns a JSON object with a message indicating success or failure and a JWT token for authentication.
-Middleware:
-auth: Middleware function for authentication.
-Checks for a JWT token in the request header.
-Verifies the token with the provided secret.
-Grants access to the route if authentication is successful.
-Additional Notes:
-This application uses MongoDB for data storage.
-User authentication is implemented using JWT tokens.
-Error handling is done for internal server errors and authentication failures.
-Modules: "books.js" and "user.js"
-Overview:
-These modules define the schemas and models for the "Book" and "User" collections in the MongoDB database. They are used for interacting with the respective collections.
+This API provides endpoints to manage books and user authentication.
 
-"books.js":
-Defines the schema for the "books" collection.
-Schema Fields:
-id: Numeric ID of the book.
-title: Title of the book.
-author: Author of the book.
-desc: Description of the book.
-books: Numeric field, purpose unclear.
-Exports a Mongoose model named "Book".
-"user.js":
-Defines the schema for the "users" collection.
-Schema Fields:
-name: Name of the user.
-username: Username of the user.
-password: Password of the user.
-Exports a Mongoose model named "User".
-Conclusion:
-This documentation provides an overview of the structure and functionality of the Node.js application implemented in "App.js", along with the schemas and models defined in "books.js" and "user.js". It outlines the API endpoints, middleware, dependencies, and configuration settings used in the application.
+#### Authentication
 
+- **POST /user/signup**
+  - Description: Sign up a new user.
+  - Request Body:
+    - username (string): Username of the new user.
+    - password (string): Password of the new user.
+  - Response:
+    - 200 OK:
+      - message: "signed Up succesfully"
+      - token: JWT token for authentication (expires in 12 hours).
+    - 500 Internal Server Error: Server failed to create the account.
 
+- **POST /user/login**
+  - Description: Log in an existing user.
+  - Request Body:
+    - username (string): Username of the user.
+    - password (string): Password of the user.
+  - Response:
+    - 200 OK:
+      - message: "login succesfully"
+      - token: JWT token for authentication (expires in 12 hours).
+    - 500 Internal Server Error: Server failed to authenticate the user.
 
+#### Books
 
+- **GET /books**
+  - Description: Retrieve all books.
+  - Authorization: Requires a valid JWT token in the 'auth' header.
+  - Response:
+    - 200 OK:
+      - books (array): List of all books.
+    - 500 Internal Server Error: Server failed to retrieve books.
 
+- **POST /books**
+  - Description: Add a new book.
+  - Authorization: Requires a valid JWT token in the 'auth' header.
+  - Request Body:
+    - title (string): Title of the book.
+    - author (string): Author of the book.
+    - desc (string): Description of the book.
+    - books (number): Number of books.
+  - Response:
+    - 200 OK:
+      - message: "book added succefully"
+      - book_id: ID of the added book.
+    - 500 Internal Server Error: Server failed to add the book.
+
+- **PUT /books/:id**
+  - Description: Update a book by its ID.
+  - Authorization: Requires a valid JWT token in the 'auth' header.
+  - Request Parameters:
+    - id (number): ID of the book to be updated.
+  - Request Body: (Fields to be updated)
+    - title (string): Title of the book.
+    - author (string): Author of the book.
+    - desc (string): Description of the book.
+    - books (number): Number of books.
+  - Response:
+    - 200 OK:
+      - message: "book updated successfully"
+    - 404 Not Found: Book with the given ID not found.
+    - 500 Internal Server Error: Server failed to update the book.
+
+- **DELETE /books/:id**
+  - Description: Delete a book by its ID.
+  - Authorization: Requires a valid JWT token in the 'auth' header.
+  - Request Parameters:
+    - id (number): ID of the book to be deleted.
+  - Response:
+    - 200 OK:
+      - message: "Deleted Successfully"
+    - 404 Not Found: Book with the given ID not found.
+    - 500 Internal Server Error: Server failed to delete the book.
+
+#### Middleware
+
+- **Authentication.js**
+  - Description: Middleware to authenticate requests using JWT token.
+  - Usage: Include this middleware in routes that require authentication.
+  - Request Header:
+    - auth: JWT token.
+  - Response:
+    - 403 Forbidden: Invalid or missing JWT token.
+
+#### Environment Variables
+
+- **.env**
+  - PORT: Port number for the server. Default is 3000.
+  - mongoDb_URL: MongoDB connection URL.
+  - Secret: Secret key for JWT token encryption.
+
+### Usage
+
+1. Clone the repository.
+2. Install dependencies: `npm install`.
+3. Set environment variables in the `.env` file.
+4. Start the server: `npm start`.
+5. Use the provided endpoints to manage books and authenticate users.
+
+### Note
+
+- Ensure proper authorization using JWT tokens for accessing protected routes.
+- Replace sensitive data like passwords and secrets with environment variables for security.
+- Handle errors gracefully and provide meaningful error messages in responses.
